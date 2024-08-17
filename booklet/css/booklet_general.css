@@ -1,0 +1,26 @@
+/* line 1, ../sass/booklet_general.scss */
+.booklet-warning {
+  color: red;
+}
+
+/**
+ * Styles for booklet views AJAX popup.
+ */
+/* line 8, ../sass/booklet_general.scss */
+.booklet-ajax-popup {
+  height: 140px;
+  width: 180px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url("../assets/spin.gif");
+}
+
+/* line 16, ../sass/booklet_general.scss */
+.booklet-container {
+  z-index: 1;
+}
+
+/* line 21, ../sass/booklet_general.scss */
+.booklet-widget-input.readonly {
+  color: gray;
+}

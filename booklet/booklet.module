@@ -1,0 +1,180 @@
+<?php
+
+/**
+ * @file
+ * Contains the booklet.module file.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function booklet_theme(&$variables) {
+  return [
+    'booklet_map' => [
+      'variables' => [
+        'map_id' => NULL,
+        'height' => '400px',
+        'map' => [],
+      ],
+    ],
+  ];
+}
+
+function booklet_preprocess(&$variables, $hook, $info) {
+  /**
+  var_dump(
+    $variables['page']
+  );
+  */
+}
+
+/**
+ * Get all available booklet map definitions.
+ *
+ * @param string $map
+ *   The specific map definition string.
+ *
+ * @return array
+ *   The booklet maps definition array.
+ */
+function booklet_map_get_info($map = NULL) {
+  static $drupal_static_fast;
+  if (!isset($drupal_static_fast)) {
+    $drupal_static_fast['booklet_map_info'] = &drupal_static(__FUNCTION__);
+  }
+  $map_info = &$drupal_static_fast['booklet_map_info'];
+
+  if (empty($map_info)) {
+    if ($cached = \Drupal::cache()->get('booklet_map_info')) {
+      $map_info = $cached->data;
+    }
+    else {
+      $map_info = \Drupal::moduleHandler()->invokeAll('booklet_map_info');
+
+      // Let other modules alter the map info.
+      \Drupal::moduleHandler()->alter('booklet_map_info', $map_info);
+
+      \Drupal::cache()->set('booklet_map_info', $map_info);
+    }
+
+  }
+
+  if (empty($map)) {
+    return $map_info;
+  }
+  else {
+    return $map_info[$map] ?? [];
+  }
+
+}
+
+/**
+ * Implements hook_booklet_map_info().
+ */
+function booklet_booklet_map_info() {
+  return [
+    'OSM Mapnik' =>
+      [
+        'label' => '- Default booklet - OSM Mapnik - ',
+        'description' => t('booklet default map.'),
+        'settings' => [
+          'dragging' => TRUE,
+          'touchZoom' => TRUE,
+          'scrollWheelZoom' => TRUE,
+          'doubleClickZoom' => TRUE,
+          'zoomControl' => TRUE,
+          'zoomControlPosition' => 'topleft',
+          'attributionControl' => TRUE,
+          'trackResize' => TRUE,
+          'fadeAnimation' => TRUE,
+          'zoomAnimation' => TRUE,
+          'closePopupOnClick' => TRUE,
+        ],
+
+
+        /**'layers' => [
+          'earth' => [
+            'urlTemplate' => '//{s}.tile.openstreetmap.org/{z}/{x}/{y2}.png',
+            'options' => [
+              'maxZoom' => 19,
+              'attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+            ],
+          ],
+        ],
+      ],
+    'multilayers' => [
+      'label' => 'Multilayers',
+      'description' => t('Multilayers'),
+      'settings' => booklet_map_info_default_settings(),*/
+
+
+
+      'layers' => [
+        'OpenStreetMap' => [
+          'urlTemplate' => '//tile.openstreetmap.org/{z}/{x}/{y}.png',
+          'options' => [
+            "maxZoom" => 19,
+            "attribution" => "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+          ],
+        ],
+        'Google Roads' => [
+          'type' => 'google',
+          'urlTemplate' => '//mt{s}.googleapis.com/vt?x={x}&y={y}&z={z}',
+          'options' => [
+            'attribution' => 'Map data &copy; <a href="https://googlemaps.com">Google</a>',
+            'detectRetina' => FALSE,
+            'subdomains' => [0, 1, 2, 3],
+          ],
+        ],
+        'Stadia Alidade Smooth' => [
+          'urlTemplate' => '//tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+          'options' => [
+            "maxZoom" => 20,
+            'attribution' => '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+          ],
+        ],
+        'Stamen TonerLite' => [
+          'urlTemplate' => '//tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.{ext}',
+          'options' => [
+            "subdomains" => "abcd",
+            "minZoom" => 0,
+            "maxZoom" => 20,
+            "ext" => "png",
+            "attribution" => "&copy; <a href='https://www.stadiamaps.com/'>Stadia Maps</a> &copy; <a href='https://www.stamen.com/'>Stamen Design</a> &copy; <a href='https://openmaptiles.org/'>OpenMapTiles</a> &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+          ],
+        ],
+        'OpenTopoMap' => [
+          'urlTemplate' => '//{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+          'options' => [
+            "minZoom" => 0,
+            "maxZoom" => 18,
+            "attribution" => 'Kartendaten: © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende, SRTM | Kartendarstellung: © <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+          ],
+        ],
+        // A Vector Tile definition usable by MapLibre GL booklet & Js.
+        // @see https://docs.stadiamaps.com/tutorials/vector-tiles-with-leaflet/
+        'Stadia Alidade Smooth Dark Vector' => [
+          // Set vector type for rendering with Vector.
+          'type' => 'vector',
+          'urlTemplate' => '//tiles.stadiamaps.com/styles/alidade_smooth_dark.json',
+          'options' => [
+            'attribution' => '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+          ],
+        ],
+        // An example Overlay definition, in addition to previous Base Layers.
+        // (@see @3050934: simultaneous multiple layers feature)
+        'OpenRailwayMap' => [
+          // Set layer type as 'overlay'.
+          'layer_type' => 'overlay',
+          // Possibly set it also initially hidden.
+          'layer_hidden' => TRUE,
+          'urlTemplate' => '//tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',
+          'options' => [
+            'maxZoom' => 19,
+            'attribution' => 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+          ],
+        ],
+      ],
+    ]
+  ];
+}

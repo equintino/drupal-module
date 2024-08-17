@@ -1,0 +1,6 @@
+booklet.controller:
+  path: "/booklet"
+  defaults:
+    _controller: "\\Drupal\\booklet\\Controllers\\BookletController::index"
+  requirements:
+    _permission: "access content"

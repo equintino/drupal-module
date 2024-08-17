@@ -1,0 +1,13 @@
+name: Booklet
+type: module
+description: 'Provides functionality for booklet.'
+package: Geolocation
+core_version_requirement: ^9 || ^10
+dependencies:
+  - geofield:geofield
+
+regions:
+  map: "Geolocation Map"
+
+version: '0.0.1'
+project: 'booklet'

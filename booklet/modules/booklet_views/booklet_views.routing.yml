@@ -1,0 +1,10 @@
+booklet_views.ajax_popup:
+  path: '/booklet-ajax-popup/{entity_type}/{entity}/{view_mode}/{langcode}'
+  defaults:
+    _controller: '\Drupal\booklet_views\Controller\BookletAjaxPopupController::popupBuild'
+  requirements:
+    _custom_access: '\Drupal\booklet_views\Controller\BookletAjaxPopupController::accessCheck'
+  options:
+    parameters:
+      entity:
+        type: entity:{entity_type}

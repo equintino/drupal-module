@@ -1,0 +1,12 @@
+name: Booklet Markercluster
+description: Extends Booklet with the Markercluster library.
+core_version_requirement: ^8.8 || ^9 || ^10
+type: module
+package: Geofield
+dependencies:
+  - booklet:booklet
+
+# Information added by Drupal.org packaging script on 2024-06-04
+version: '10.2.17'
+project: 'booklet'
+datestamp: 1717489151

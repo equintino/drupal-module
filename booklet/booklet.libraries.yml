@@ -1,0 +1,57 @@
+booklet:
+  version: 0.0.1
+  css:
+    component:
+      css/myCluster.css: {}
+      css/MarkerCluster.css: {}
+      css/booklet.css: {}
+      css/style.css: {}
+      css/controlLoading.css: {}
+  js:
+    js/index.js: { attributes: { type: 'module' } }
+    js/src/lib/booklet.js: {}
+    js/src/lib/booklet.markercluster.js: {}
+    js/src/lib/ControlLoading.js: {}
+    js/global.js: {}
+
+general:
+  version: 1.x
+  css:
+    component:
+      css/booklet_general.css: {}
+
+booklet-drupal:
+  version: VERSION
+  js:
+    js/booklet.drupal.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - booklet/booklet
+
+# MapLibre GL booklet,
+# for enabling in booklet map any vector tile source usable by MapLibre GL JS
+maplibre-gl-booklet:
+  remote: https://github.com/maplibre/maplibre-gl-leaflet
+  version: 0.0.20
+  license:
+    name: MapLibre-GL-booklet ISC License
+    url: https://github.com/maplibre/maplibre-gl-leaflet/blob/main/LICENSE
+  js:
+    js/booklet-maplibre-gl-0.0.20/booklet-maplibre-gl.js: {}
+  dependencies:
+    - booklet/maplibre-gl-js
+
+
+# Custom booklet Geocoder control implementation
+booklet.geocoder:
+  version: 1.x
+  css:
+    component:
+      css/autocomplete-loading.module.css: { weight: -10 }
+  js:
+    js/booklet.geocoder.js: {}
+  dependencies:
+    - core/drupal.autocomplete
+    - booklet/booklet-drupal

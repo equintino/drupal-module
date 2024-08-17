@@ -1,0 +1,71 @@
+<?php
+
+/**
+ * @file
+ * Contains the booklet.install file.
+ */
+
+use Drupal\Core\Link;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_requirements().
+ */
+function booklet_requirements($phase) {
+  $requirements = [];
+  if ($phase != 'runtime') {
+    return $requirements;
+  }
+
+  $library = \Drupal::service('library.discovery')
+    ->getLibraryByName('booklet', 'booklet');
+
+  $requirements['booklet'] = [
+    'title' => \Drupal::translation()->translate('Booklet library'),
+  ];
+
+  $maps_info = \Drupal::translation()->translate('@maps available.', [
+      '@maps' => \Drupal::translation()
+        //->formatPlural(count(booklet_map_get_info()), 'One map', '@count maps'),
+        ->formatPlural(0, 'One map', '@count maps'),
+    ]
+  );
+
+
+  // Check the defined type of the booklet.js file; if it is external then
+  // assume that we are using a CDN version.
+
+  if ($library['js'][0]['type'] == 'external') {
+    $requirements['booklet']['value'] = \Drupal::translation()
+      ->translate('Using CDN version @version.', [
+        '@version' => $library['version'],
+      ]) . ' ' . $maps_info;
+  }
+
+  // If booklet.js is defined to be a local file, check that it exists and show
+  // an error if it does not exist.
+  else {
+    if (file_exists($library['js'][0]['data'])) {
+      $requirements['booklet']['value'] = \Drupal::translation()
+        ->translate('Booklet @version library installed at @path.', [
+          '@version' => $library['version'],
+          '@path' => $library['js'][0]['data'],
+        ]) . ' ' . $maps_info;
+      $requirements['booklet']['severity'] = REQUIREMENT_OK;
+    }
+    else {
+      $requirements['booklet']['value'] = \Drupal::translation()
+        ->translate('booklet @version library not found at @path. Please !download it to @directory, or undo your changes to the libraries registry to use the CDN version.',
+          [
+            '@version' => $library['version'],
+            '@path' => $library['js'][0]['data'],
+            '@directory' => dirname($library['js'][0]['data']),
+            '!download' => Link::fromTextAndUrl('download', Url::fromUri($library['remote'])),
+          ]
+        );
+      $requirements['booklet']['severity'] = REQUIREMENT_ERROR;
+    }
+  }
+
+  return $requirements;
+}

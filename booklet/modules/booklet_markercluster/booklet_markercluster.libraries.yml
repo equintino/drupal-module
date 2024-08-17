@@ -1,0 +1,22 @@
+booklet-markercluster:
+  remote: https://github.com/Booklet/Booklet.markercluster
+  version: 1.4.0
+  license:
+    name: MIT-License
+    url: https://github.com/Booklet/Booklet.markercluster/blob/master/MIT-LICENCE.txt
+    gpl-compatible: true
+  js:
+    js/booklet_markercluster/dist/booklet.markercluster.js: {}
+  css:
+    component:
+      js/booklet_markercluster/dist/MarkerCluster.css: {}
+      js/booklet_markercluster/dist/MarkerCluster.Default.css: {}
+  dependencies:
+    - booklet/booklet
+
+booklet-markercluster-drupal:
+  version: VERSION
+  js:
+    booklet_markercluster.drupal.js: {}
+  dependencies:
+    - booklet/booklet-drupal

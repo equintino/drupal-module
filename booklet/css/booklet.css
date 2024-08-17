@@ -1,0 +1,664 @@
+/* required styles */
+
+.booklet-pane,
+.booklet-tile,
+.booklet-marker-icon,
+.booklet-marker-shadow,
+.booklet-tile-container,
+.booklet-pane > svg,
+.booklet-pane > canvas,
+.booklet-zoom-box,
+.booklet-image-layer,
+.booklet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.booklet-container {
+	overflow: hidden;
+	}
+.booklet-tile,
+.booklet-marker-icon,
+.booklet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.booklet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.booklet-safari .booklet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.booklet-safari .booklet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.booklet-marker-icon,
+.booklet-marker-shadow {
+	display: block;
+	}
+/* .booklet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .booklet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.booklet-container .booklet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.booklet-container .booklet-marker-pane img,
+.booklet-container .booklet-shadow-pane img,
+.booklet-container .booklet-tile-pane img,
+.booklet-container img.booklet-image-layer,
+.booklet-container .booklet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.booklet-container img.booklet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.booklet-container.booklet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.booklet-container.booklet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.booklet-container.booklet-touch-drag.booklet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.booklet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.booklet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.booklet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.booklet-tile-loaded {
+	visibility: inherit;
+	}
+.booklet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.booklet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.booklet-pane         { z-index: 400; }
+
+.booklet-tile-pane    { z-index: 200; }
+.booklet-overlay-pane { z-index: 400; }
+.booklet-shadow-pane  { z-index: 500; }
+.booklet-marker-pane  { z-index: 600; }
+.booklet-tooltip-pane   { z-index: 650; }
+.booklet-popup-pane   { z-index: 700; }
+
+.booklet-map-pane canvas { z-index: 100; }
+.booklet-map-pane svg    { z-index: 200; }
+
+.booklet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.booklet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.booklet-top,
+.booklet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.booklet-top {
+	top: 0;
+	}
+.booklet-right {
+	right: 0;
+	}
+.booklet-bottom {
+	bottom: 0;
+	}
+.booklet-left {
+	left: 0;
+	}
+.booklet-control {
+	float: left;
+	clear: both;
+	}
+.booklet-right .booklet-control {
+	float: right;
+	}
+.booklet-top .booklet-control {
+	margin-top: 10px;
+	}
+.booklet-bottom .booklet-control {
+	margin-bottom: 10px;
+	}
+.booklet-left .booklet-control {
+	margin-left: 10px;
+	}
+.booklet-right .booklet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.booklet-fade-anim .booklet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.booklet-fade-anim .booklet-map-pane .booklet-popup {
+	opacity: 1;
+	}
+.booklet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.booklet-zoom-animated {
+	will-change: transform;
+}
+
+.booklet-zoom-anim .booklet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.booklet-zoom-anim .booklet-tile,
+.booklet-pan-anim .booklet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.booklet-zoom-anim .booklet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.booklet-interactive {
+	cursor: pointer;
+	}
+.booklet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.booklet-crosshair,
+.booklet-crosshair .booklet-interactive {
+	cursor: crosshair;
+	}
+.booklet-popup-pane,
+.booklet-control {
+	cursor: auto;
+	}
+.booklet-dragging .booklet-grab,
+.booklet-dragging .booklet-grab .booklet-interactive,
+.booklet-dragging .booklet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.booklet-marker-icon,
+.booklet-marker-shadow,
+.booklet-image-layer,
+.booklet-pane > svg path,
+.booklet-tile-container {
+	pointer-events: none;
+	}
+
+.booklet-marker-icon.booklet-interactive,
+.booklet-image-layer.booklet-interactive,
+.booklet-pane > svg path.booklet-interactive,
+svg.booklet-image-layer.booklet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.booklet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.booklet-container a {
+	color: #0078A8;
+	}
+.booklet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.booklet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.booklet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.booklet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.booklet-bar a,
+.booklet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.booklet-bar a:hover,
+.booklet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.booklet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.booklet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.booklet-bar a.booklet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.booklet-touch .booklet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.booklet-touch .booklet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.booklet-touch .booklet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.booklet-control-zoom-in,
+.booklet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.booklet-touch .booklet-control-zoom-in, .booklet-touch .booklet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.booklet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.booklet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.booklet-retina .booklet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.booklet-touch .booklet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.booklet-control-layers .booklet-control-layers-list,
+.booklet-control-layers-expanded .booklet-control-layers-toggle {
+	display: none;
+	}
+.booklet-control-layers-expanded .booklet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.booklet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.booklet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.booklet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.booklet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.booklet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.booklet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.booklet-container .booklet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.booklet-control-attribution,
+.booklet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.booklet-control-attribution a {
+	text-decoration: none;
+	}
+.booklet-control-attribution a:hover,
+.booklet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.booklet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.booklet-left .booklet-control-scale {
+	margin-left: 5px;
+	}
+.booklet-bottom .booklet-control-scale {
+	margin-bottom: 5px;
+	}
+.booklet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.booklet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.booklet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.booklet-touch .booklet-control-attribution,
+.booklet-touch .booklet-control-layers,
+.booklet-touch .booklet-bar {
+	box-shadow: none;
+	}
+.booklet-touch .booklet-control-layers,
+.booklet-touch .booklet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.booklet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.booklet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.booklet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.booklet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.booklet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.booklet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.booklet-popup-content-wrapper,
+.booklet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.booklet-container a.booklet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.booklet-container a.booklet-popup-close-button:hover,
+.booklet-container a.booklet-popup-close-button:focus {
+	color: #585858;
+	}
+.booklet-popup-scrolled {
+	overflow: auto;
+	}
+
+.booklet-oldie .booklet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.booklet-oldie .booklet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.booklet-oldie .booklet-control-zoom,
+.booklet-oldie .booklet-control-layers,
+.booklet-oldie .booklet-popup-content-wrapper,
+.booklet-oldie .booklet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.booklet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.booklet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.booklet-tooltip.booklet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.booklet-tooltip-top:before,
+.booklet-tooltip-bottom:before,
+.booklet-tooltip-left:before,
+.booklet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.booklet-tooltip-bottom {
+	margin-top: 6px;
+}
+.booklet-tooltip-top {
+	margin-top: -6px;
+}
+.booklet-tooltip-bottom:before,
+.booklet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.booklet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.booklet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.booklet-tooltip-left {
+	margin-left: -6px;
+}
+.booklet-tooltip-right {
+	margin-left: 6px;
+}
+.booklet-tooltip-left:before,
+.booklet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.booklet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.booklet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.booklet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+
+/** custom */
+#map { height: 350px; }
