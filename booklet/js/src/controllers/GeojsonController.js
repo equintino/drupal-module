@@ -18,6 +18,200 @@ export default class GeojsonController extends Controller {
             page = geojsonController.view.page
 
         geojsonController.layerGroup()
+        return
+
+
+        // file = `${this.path}/booklet/js/files/regions/distritos/missing-freguesias.json`
+
+        function removeAccent(str) {
+            return str.replace(/[AÁÀÃÂáàâã]/g,'a').replace(/[Çç]/g,'c').replace(/[ÉÈÊéèê]/g,'e').replace(/[ÍÌ]/g,'i').replace(/[ÓÒÕÔóòõô]/g,'o').replace(/[ÚÙúù]/g,'u').replace(/ /g,'').toLowerCase()
+        }
+
+        // const file = `${geojsonController.path}/booklet/js/files/geojson/missing.json`
+        const prefix = `${geojsonController.path}/booklet/js/files/regions/concelhos/`
+        const file = `${geojsonController.path}/booklet/js/files/regions/concelhos/moncao.json`
+        // const file = `${geojsonController.path}/booklet/js/files/regions/freguesias.json`
+        const file2 = `${geojsonController.path}/booklet/js/files/geojson/_portugal.json`
+
+        const distritos  = []
+        const concelhos  = []
+        const freguesias = []
+        const dis_con    = {}
+        const newData    = []
+        let newFre
+        let filterDis    = 'Portalegre'
+        let filterCon    = ''
+        let _reg = {}
+        _reg[filterDis] = filterCon !== '' ? { [filterCon]: [] } : {}
+
+        const promise = new Promise((resolve, reject) => {
+            resolve(
+                fetch(file).then((data) => data.json())
+                    .then((atual) => {
+                        atual.forEach((e) => {
+                            let dis = e.properties.distrito
+                            let con = e.properties.concelho
+                            if (dis === filterDis && filterCon && con === filterCon) {
+                                newData.push(e)
+                                freguesias.push(e.properties.freguesia)
+                            }
+                            else if (dis === filterDis) {
+                                newData.push(e)
+                            }
+                            // if (!dis_con.hasOwnProperty(e.properties.distrito)) {
+                            //     dis_con[e.properties.distrito] = {}
+                            // }
+                            // if (!dis_con[e.properties.distrito].hasOwnProperty(e.properties.concelho)) {
+                            //     dis_con[e.properties.distrito][e.properties.concelho] = []
+                            // }
+                            // if (dis_con[e.properties.distrito][e.properties.concelho].indexOf(e.properties.freguesia) === -1) {
+                            //     dis_con[e.properties.distrito][e.properties.concelho].push(e)
+                            //     newData.push(e)
+                            // }
+                        })
+
+                        fetch(file2).then((data) => data.json())
+                            .then((d) => d.filter((e) => e.name === filterDis))
+                            .then((d) => d[0].conselhos.filter((e) => filterCon !== "" ? e.name === filterCon : true))
+                            .then((d) => {
+                                let missing = []
+                                d.forEach((_d) => {
+                                    let _concelho    = _d.name
+                                    let _freguesias  = _d.freguesias
+
+                                    // let reg  = d[0].freguesias
+                                    _freguesias.forEach((_data, i) => {
+                                        _freguesias[i].distrito = filterDis
+                                        _freguesias[i].concelho = _concelho
+                                        // if (e.name !== _data.properties.freguesia) {
+                                        //     console.log({
+                                        //         con: _data.properties.dicofre,
+                                        //         fre: _data.properties.freguesia,
+                                        //         e
+                                        //     })
+                                        // }
+
+                                        newData.map((e) => {
+                                            if (e.properties.dicofre == _data.code) delete _freguesias[i]
+                                        })
+
+                                        // if (reg[i]) _reg[filterDis][filterCon].push(reg[i])
+
+
+                                        // if (find) {
+                                        //     console.log(d[0].freguesias[i])
+                                        // }
+
+                                            // console.log(
+                                            //     _data.properties.dicofre,
+                                            //     _data.properties.freguesia
+                                            // )
+                                            // if (freguesias.indexOf(e.name) === -1) {
+                                            //     console.log(
+                                            //         e.name
+                                            //     )
+                                            // }
+                                            // local.forEach((_e) => {
+                                            //     let dis = _e.properties.distrito
+                                            //     let con = _e.properties.concelho
+                                            //     let fre = _e.properties.freguesia
+                                            //     console.log({
+                                            //         dis,
+                                            //         con,
+                                            //         fre,
+                                            //         e
+                                            //     })
+                                            // })
+
+                                        // })
+                                    })
+                                    // console.log({
+                                    //     newFre: d[0].freguesias.filter((e) => e.name),
+                                    //     freguesias
+                                    // })
+                                    missing.push(_freguesias.filter((d) => d))
+                                })
+                                return missing
+                            })
+                            .then((reg) => {
+                                reg.forEach((e) => {
+                                    e.forEach((_e) => {
+                                        fetch(`https://json.geoapi.pt/municipio/${_e.concelho}`).then((data) => data.json())
+                                            .then((d) => {
+                                                const newGeo = d.geojsons.freguesias.filter((_d) => _d.properties.Dicofre == _e.code)
+                                                document.querySelector('#page').append(JSON.stringify(newGeo))
+                                                console.log(
+                                                    JSON.stringify(newGeo)
+                                                    // d.geojsons.freguesias,
+                                                    // e.code,
+                                                    // filterCon
+                                                )
+                                            })
+                                        // console.log(
+                                        //     e.name
+                                        // )
+                                    })
+                                })
+                                // console.log({ reg, _reg })
+                            })
+
+
+                            //     d.conselhos.filter((e) => {
+                            //     console.log(
+                            //         e
+                            //     )
+                            // }))
+                            //     e.conselhos.filter((e) => e.name === 'Águeda')))
+                            // .then((i) => {
+                            //     console.log(
+                            //         i
+                            //     )
+                            // })
+
+
+                        // console.log((
+                        //     freguesias
+                        // ))
+                        // document.querySelector('#page').append(JSON.stringify(newData))
+
+
+
+
+
+        //                 for (let dis in local) {
+        //                     let _dis = removeAccent(dis)
+
+        //                     for (let con in local[dis]) {
+        //                         let _con = removeAccent(con)
+        //                         let search = local[dis][con]
+        //                         search.forEach((i) => {
+
+        //                             return fetch(prefix + _con + '.json')
+        //                                 .then((data) => data.json())
+        //                                 .then((d) => d.filter((_d) => {
+        //                                         // console.log(
+        //                                         //     _d
+        //                                         // )
+        //                                         if (removeAccent(_d.properties.distrito) === _dis && removeAccent(_d.properties.concelho) === _con && _d.geometry.type === 'Polygon') {
+        //                                             if (_d.properties.name.match(i) !== -1) {
+        //                                                 return _d
+        //                                             }
+        //                                         //     // let fre = _d.properties.name.split(' ').pop()
+        //                                         //     // console.log(
+        //                                         //     //     partern
+        //                                         //     // )
+        //                                         }
+        //                                 }))
+        //                                 .then((resp) => {
+        //                                     all.push(resp)
+        //                                     document.querySelector('#page').append(JSON.stringify(resp))
+        //                                 })
+        //                         })
+        //                     }
+        //                 }
+                })
+            )
+        })
      }
 
     ibad() {
@@ -49,8 +243,10 @@ export default class GeojsonController extends Controller {
 
         let families = []
 
-        this.service.getGeojson()
-            .then(geojson => {
+        /** conferir a leitura do json */
+        // this.service.getGeojson()
+            // .then(() => {
+
                 // for (let i of geojson) {
                 //     families.push(i.properties.family)
                 // }
@@ -125,7 +321,7 @@ export default class GeojsonController extends Controller {
 
                 layerControl.addBaseLayer(openTopoMap, "OpenTopoMap");
 
-                this.#graphicDensity({ map, geojson })
+                this.#graphicDensity({ map })
                     .then((density) => {
                         layerControl.addOverlay(density, "Distritos")
                     })
@@ -171,10 +367,11 @@ export default class GeojsonController extends Controller {
             //                 })
             //             })
                     })
-            })
-            .catch((err) => {
-                alert(`No geojson files found (${err})`)
-            })
+
+            // })
+            // .catch((err) => {
+            //     alert(`No geojson files found (${err})`)
+            // })
     }
 
     getColorState(d) {
@@ -183,7 +380,7 @@ export default class GeojsonController extends Controller {
         if (d.freguesia)                return '#d74222'
     }
 
-    #graphicDensity({ map, geojson }) {
+    #graphicDensity({ map }) {
         const style = (feature) => {
                 return {
                     fillColor: this.getColorState(feature.properties),
@@ -218,7 +415,8 @@ export default class GeojsonController extends Controller {
                 }))
         }
         else if (freguesia == null && concelho != null) {
-            file = `${this.path}/booklet/js/files/regions/freguesias.json`
+            file = `${this.path}/booklet/js/files/regions/_freguesias.json`
+            // file = `${this.path}/booklet/js/files/regions/distritos/leiria.json`
             return this.service.getRegions({ file })
                 .then(data => data.filter((d) => {
                     if (concelho.toLowerCase() === d.properties.concelho.toLowerCase()) {
@@ -315,22 +513,10 @@ export default class GeojsonController extends Controller {
         info.update = async function (props) {
             if (typeof(props) === 'object') {
                 this._div.innerHTML = '<h4>DETAILS</h4>'
-                for (let i in props) {
-                    if ('brasao' !== i.toLowerCase() && 'name' !== i.toLowerCase()) {
-                        this._div.innerHTML += `<p>${i.toUpperCase()}: ${props[i].toUpperCase()}</p>`
-                    }
-                    else if ('name' === i.toLowerCase()) {
-                        let name = props[i].split(' ')
-                        let n = ''
-                        for (let x = 0; x < name.length; x++) {
-                            n += (x < 3) ? name[x] + " " : (x < 4) ? `<br>${name[x]}` : name[x] + ' '
-                        }
-                        this._div.innerHTML += `<p>${i.toUpperCase()}: ${n}</p>`
-                    }
-                    else {
-                        if (props[i] !== 'nan') this._div.innerHTML += `<img src=${props[i]} alt="sem brasao" />`
-                    }
-                }
+                this._div.innerHTML += (props.distrito ? `<p>DISTRITO: ${props.distrito}</p>`: '')
+                this._div.innerHTML += (props.concelho ? `<p>CONCELHO: ${props.concelho}</p>` : '')
+                this._div.innerHTML += (props.freguesia ? `<p>FREGUESIA: ${props.freguesia}</p>` : '')
+                this._div.innerHTML += (props.brasao && props.brasao !== 'nan' ? `<p><img src=${props.brasao} alt="sem brasao" /></p>` : '')
             }
         };
 

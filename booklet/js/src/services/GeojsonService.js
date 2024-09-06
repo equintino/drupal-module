@@ -17,7 +17,7 @@ export default class GeojsonService extends Service {
     getGeojson() {
         return new Promise((resolve, reject) => {
             return resolve(
-                fetch(`${this.path}/booklet/js/files/regions/freguesias.json`)
+                fetch(`${this.path}/booklet/js/files/regions/concelhos.json`)
                    .then((response) => response.json())
             )
         })
