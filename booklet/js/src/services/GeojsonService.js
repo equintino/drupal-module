@@ -1,40 +1,26 @@
+import { removeAccent } from "../lib/utils.js";
 import Service from "./Service.js";
 
 export default class GeojsonService extends Service {
-    path = '../modules/custom'
-    listDisConFre
-
-    initMap({ latlng, zoom, minZoom=null }) {
-        var map = L.map('map').setView(latlng, zoom);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            minZoom,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-        }).addTo(map);
-        return map
-    }
-
-    getGeojson() {
-        return new Promise((resolve, reject) => {
-            return resolve(
-                fetch(`${this.path}/booklet/js/files/regions/concelhos.json`)
-                   .then((response) => response.json())
+    getRegions({ file, filter }) {
+        return fetch(file).then((d) => {
+            return d.json()
+                .then((_d) => {
+                    if (typeof(filter) === 'object') {
+                        const data = (_d.type === 'FeatureCollection' ? _d.features : _d)
+                        return data.filter((_e) => {
+                            for (let i in filter) {
+                                if (typeof(filter[i]) === 'object') {
+                                    for (let _i in filter[i]) {
+                                        return removeAccent(_e[i][_i]).toLowerCase().trim() === removeAccent(filter[i][_i]).toLowerCase().trim()
+                                    }
+                                }
+                            }
+                        })
+                    }
+                    return _d
+                }
             )
         })
-    }
-
-    getRegions({ file }) {
-        return fetch(file).then((d) => d.json())
-    }
-
-    getCenterMap() {
-        return fetch(`${this.path}/booklet/js/files/regions/freguesias-metadata.json`)
-            .then((response) => {
-                return response.json()
-            })
-            .then((response) => {
-                const coordinates = response[0].geometry.coordinates[0][0]
-                return [coordinates[1], coordinates[0]]
-            })
     }
 }

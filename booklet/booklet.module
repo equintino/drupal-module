@@ -20,14 +20,6 @@ function booklet_theme(&$variables) {
   ];
 }
 
-function booklet_preprocess(&$variables, $hook, $info) {
-  /**
-  var_dump(
-    $variables['page']
-  );
-  */
-}
-
 /**
  * Get all available booklet map definitions.
  *
