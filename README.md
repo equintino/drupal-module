@@ -9,6 +9,8 @@ The Geofield module needs to be installed
 
 __$ composer require drupal/geofield__
 
+## Booklet
+Copy this folder into Modules -> custom
 
 ## Configuration
 
