@@ -16,18 +16,18 @@ Once enabled the module it will be possible to add a "Geofield" field type to
 any entity type/bundle and then choose the preferred widget or formatter.
 
 
-## Step to stap
+## Step by step
 Creating a Content Type
 in structure -> content type -> add content type
-_ Fill in the name, example "Map" or whatever you want
-_ Publishing Options only leaves "Published" marked
-_ Save
+   + Fill in the name, example "Map" or whatever you want
+   + Publishing Options only leaves "Published" marked
+   + Save
 
 ### Manage field
 _ add field
    + Geofield
    + label "Map" or whatever you want
-_ Save
+   + Save
 
 _Field setting
    + Save
@@ -36,7 +36,7 @@ _Field setting
 _ In the created field
   + label = Hidden
   + Booklet Map
-_ Save
+  + Save
 
 ### Creating content
 _ Add content
@@ -46,6 +46,6 @@ _ Add content
       + Check (Provide a menu link)
    + URL alias
       /maps
-_ Save
+   + Save
 
 *The created page will display the map
