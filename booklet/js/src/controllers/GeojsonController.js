@@ -3,7 +3,7 @@ import GeojsonView from "../views/GeojsonView.js";
 import GeojsonService from "../services/GeojsonService.js";
 
 export default class GeojsonController extends Controller {
-    path                  = '../modules/custom'
+    path                  = 'modules/custom'
     distritoInConcelhos   = []
     concelhosInFreguesias = []
 
