@@ -1,6 +1,7 @@
 import Controller from "./Controller.js";
 import GeojsonView from "../views/GeojsonView.js";
 import GeojsonService from "../services/GeojsonService.js";
+import { removeAccent, removeWhiteSpace } from "../lib/utils.js";
 
 export default class GeojsonController extends Controller {
     path                  = 'modules/custom'
@@ -55,9 +56,9 @@ export default class GeojsonController extends Controller {
     }
 
     getColorState(d) {
-        if (d.distrito && !d.concelho)  return '#f3fd7e'
-        if (d.concelho && !d.freguesia) return '#e18041'
-        if (d.freguesia)                return '#d74222'
+        if ((d.dis_name || d.distrito) && (!d.con_name && !d.concelho))  return '#f3fd7e'
+        if ((d.con_name || d.concelho) && (!d.freguesia && !d.fre_name)) return '#e18041'
+        if (d.fre_name || d.freguesia) return '#d74222'
     }
 
     #graphicDensity({ map, layerControl }) {
@@ -86,20 +87,24 @@ export default class GeojsonController extends Controller {
             file = `${this.path}/booklet/js/files/geojson/distritos.json`
             return this.service.getRegions({ file })
                 .then((d) => {
-                    d.unshift({ region: 'Distrito' })
+                    (
+                        d.type === 'FeatureCollection' ? d.features.unshift({ region: 'Distrito'}) : d.unshift({ region: 'Distrito' })
+                    )
                     return d
                 }
             )
         }
         else if (distrito != null && concelho == null) {
-            file = `${this.path}/booklet/js/files/geojson/concelhos.json`
+            let _distrito = removeWhiteSpace(removeAccent(distrito)).toLowerCase()
+            file = `${this.path}/booklet/js/files/geojson/concelhos/${_distrito}.json`
             const filter = { properties: { dis_name: distrito }}
             return this.service.getRegions({ file, filter })
         }
         else if (freguesia == null && concelho != null) {
-            file = `${this.path}/booklet/js/files/geojson/freguesias.json`
-            const filter = { properties: { concelho: concelho } }
-            return this.service.getRegions({ file, filter })
+            let _distrito = removeWhiteSpace(removeAccent(distrito)).toLowerCase()
+            file = `${this.path}/booklet/js/files/geojson/freguesias/${_distrito}.json`
+            const filter = { properties: { con_name: concelho } }
+            return this.service.getRegions({ file, filter, type: 'freguesia' })
         }
     }
 
@@ -130,9 +135,7 @@ export default class GeojsonController extends Controller {
                 click    : zoomToFeature
             })
             layer.on({
-                mouseover: () => {
-                    info.update(feature.properties)
-                }
+                mouseover: () => info.update(feature.properties)
             })
             layer.on({
                 click: () => {
@@ -173,10 +176,14 @@ export default class GeojsonController extends Controller {
         const filter = {
             'dis_name'  : 'distrito',
             'distrito'  : 'distrito',
+            'Distrito'  : 'distrito',
             'con_name'  : 'concelho',
-            'brasao'    : 'brasao',
+            'concelho'  : 'concelho',
+            'Concelho'  : 'concelho',
+            'fre_name'  : 'freguesia',
             'freguesia' : 'freguesia',
-            'concelho'  : 'concelho'
+            'Freguesia' : 'freguesia',
+            'brasao'    : 'brasao'
         }
         const data = {}
         for (let i in properties) {
