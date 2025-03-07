@@ -15,10 +15,17 @@ export default class GeojsonController extends Controller {
             }),
             page = geojsonController.view.page
 
-        geojsonController.#layerGroup()
+        geojsonController.#layerGroup({
+            // center: [ 38.6650095, -9.1784469 ],
+            // center: [ 38.6672692, -9.1740225 ],
+            center: [ 38.66642, -9.17650 ],
+            // center: [40.712216, -74.22655], //imageOverlay
+            // center: [ 38666145, -9176470 ],
+            zoom: 17
+        })
      }
 
-    #layerGroup() {
+    #layerGroup({ center, zoom }) {
         const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '©'
@@ -29,8 +36,9 @@ export default class GeojsonController extends Controller {
             });
 
         const map = L.map('map', {
-            center: [ 40.543577, -8.4532394 ],
-            zoom: 7,
+            // center: [ 40.543577, -8.4532394 ],
+            // zoom: 7,
+            center, zoom,
             layers: [osm],
             loadingControl: true
         })
@@ -46,13 +54,22 @@ export default class GeojsonController extends Controller {
             attribution: '©'
         });
 
-        layerControl.addBaseLayer(openTopoMap, "OpenTopoMap");
+        layerControl.addBaseLayer(openTopoMap, "OpenTopoMap")
 
-        this.#graphicDensity({ map, layerControl })
+        this.#imageOverlay({ map, layerControl })
+
+    //////////////////////////////////////////////////
+        /** Enable district */
+        /** Districts */
+        /**
+        let file = `${this.path}/booklet/js/files/geojson/district.json`
+        this.#graphicDensity({ map, layerControl, file })
             .then((density) => {
                 layerControl.addOverlay(density, "Distritos")
             }
         )
+        */
+     ///////////////////////////////////////////////
     }
 
     getColorState(d) {
@@ -61,31 +78,59 @@ export default class GeojsonController extends Controller {
         if (d.fre_name || d.freguesia) return '#d74222'
     }
 
-    #graphicDensity({ map, layerControl }) {
+    async #imageOverlay({ map, layerControl }) {
+        /**
+         * ImageOverlay (show buildings)
+        */
         const style = (feature) => {
             return {
                 fillColor: this.getColorState(feature.properties),
                 weight: 2,
                 opacity: 1,
-                color: 'red',
+                // color: 'red',
+                dashArray: '3',
+                fillOpacity: 0.1
+            }
+        }
+        const imageUrl = `${this.path}/booklet/js/files/imagens/Pgt-alm-sat.png`
+        const geojson = await this.service.getGeojson({
+                file: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm.json`,
+                reverse: true
+            })
+        const imageBounds = geojson.features[0].geometry.coordinates[0]
+        L.imageOverlay(imageUrl, imageBounds, { opacity: 0.8 }).addTo(map)
+
+        const coordReverse = await this.service.coordReverse(geojson)
+
+        const density = await L.geoJSON(coordReverse, { style })
+        this.addInteration({
+            map, geojson, style, density, layerControl
+        }).addTo(map)
+    }
+
+    async #graphicDensity({ map, layerControl, file }) {
+        let geojson
+        let density
+        const style = (feature) => {
+            return {
+                fillColor: this.getColorState(feature.properties),
+                weight: 2,
+                opacity: 1,
+                // color: 'red',
                 dashArray: '3',
                 fillOpacity: 0.7
             }
-        },
-        regions = this.#getRegions({})
+        }
 
-        return regions.then((_regions) => {
-            const density = L.geoJSON(_regions, { style })
-            return this.addInteration({ map, statesData: _regions, style, density, layerControl }).addTo(map)
-        })
-        .then((density) => density)
+        const district = await this.#getRegions({}) // Districts
+        density = L.geoJSON(district, { style })
+        this.addInteration({ map, geojson: district, style, density, layerControl }).addTo(map)
     }
 
-    #getRegions({ distrito, concelho, freguesia }) {
-        let file
+    #getRegions({ distrito, concelho, freguesia, file }) {
+        file = file ?? `${this.path}/booklet/js/files/geojson/district.json`
         if (distrito == null && concelho == null) {
-            file = `${this.path}/booklet/js/files/geojson/distritos.json`
-            return this.service.getRegions({ file })
+            return this.service.getGeojson({ file, reverse: false })
                 .then((d) => {
                     (
                         d.type === 'FeatureCollection' ? d.features.unshift({ region: 'Distrito'}) : d.unshift({ region: 'Distrito' })
@@ -108,25 +153,24 @@ export default class GeojsonController extends Controller {
         }
     }
 
-    addInteration({ map, statesData, style, density, layerControl }) {
+    addInteration({ map, geojson, style, density, layerControl }) {
         const highlightFeature = (e) => {
             const layer = e.target
-
             layer.setStyle({
-                weight: 5,
+                weight: 2,
                 color: '#666',
                 dashArray: '',
-                fillOpacity: 0.7
+                fillOpacity: 0.2
             })
-        },
-        resetHightlight = (e) => {
+        }
+        const resetHightlight = (e) => {
             density.resetStyle(e.target)
-        },
-        zoomToFeature = (e) => {
+        }
+        const zoomToFeature = (e) => {
             map.fitBounds(e.target.getBounds())
-        },
-        info = this.#customControl({ map }),
-        onEachFeature = (feature, layer) => {
+        }
+        const info = this.#customControl({ map })
+        const onEachFeature = (feature, layer) => {
             feature.properties = this.#customName(feature.properties)
 
             layer.on({
@@ -139,6 +183,11 @@ export default class GeojsonController extends Controller {
             })
             layer.on({
                 click: () => {
+
+
+                    /////////////////////////////////////////////////
+                    /** Enable District */
+                    /**
                     let distrito  = feature.properties.distrito
                     let concelho  = feature.properties.concelho
                     let freguesia = feature.properties.freguesia
@@ -161,11 +210,15 @@ export default class GeojsonController extends Controller {
                             }
                         }
                     )
+                    */
+                    /////////////////////////////////////////////////
+
+
                 }
             })
         }
         this.#customLegendControl(map)
-        return L.geoJson(statesData, {
+        return L.geoJson(geojson, {
             style,
             onEachFeature
         })
@@ -174,16 +227,17 @@ export default class GeojsonController extends Controller {
     /** Customize names */
     #customName(properties) {
         const filter = {
-            'dis_name'  : 'distrito',
-            'distrito'  : 'distrito',
-            'Distrito'  : 'distrito',
-            'con_name'  : 'concelho',
-            'concelho'  : 'concelho',
-            'Concelho'  : 'concelho',
-            'fre_name'  : 'freguesia',
-            'freguesia' : 'freguesia',
-            'Freguesia' : 'freguesia',
-            'brasao'    : 'brasao'
+            'dis_name'    : 'distrito',
+            'distrito'    : 'distrito',
+            'Distrito'    : 'distrito',
+            'con_name'    : 'concelho',
+            'concelho'    : 'concelho',
+            'Concelho'    : 'concelho',
+            'fre_name'    : 'freguesia',
+            'freguesia'   : 'freguesia',
+            'Freguesia'   : 'freguesia',
+            'brasao'      : 'brasao',
+            'name'        : 'name'
         }
         const data = {}
         for (let i in properties) {
