@@ -154,6 +154,7 @@ export default class GeojsonController extends Controller {
     }
 
     addInteration({ map, geojson, style, density, layerControl }) {
+        const info = this.#customControl({ map })
         const highlightFeature = (e) => {
             const layer = e.target
             layer.setStyle({
@@ -169,7 +170,6 @@ export default class GeojsonController extends Controller {
         const zoomToFeature = (e) => {
             map.fitBounds(e.target.getBounds())
         }
-        const info = this.#customControl({ map })
         const onEachFeature = (feature, layer) => {
             feature.properties = this.#customName(feature.properties)
 
@@ -179,7 +179,8 @@ export default class GeojsonController extends Controller {
                 click    : zoomToFeature
             })
             layer.on({
-                mouseover: () => info.update(feature.properties)
+                mouseover: () => info.update(feature.properties),
+                mouseout: () => info.clear()
             })
             layer.on({
                 click: () => {
@@ -227,6 +228,7 @@ export default class GeojsonController extends Controller {
     /** Customize names */
     #customName(properties) {
         const filter = {
+            'name'        : 'name',
             'dis_name'    : 'distrito',
             'distrito'    : 'distrito',
             'Distrito'    : 'distrito',
@@ -236,8 +238,7 @@ export default class GeojsonController extends Controller {
             'fre_name'    : 'freguesia',
             'freguesia'   : 'freguesia',
             'Freguesia'   : 'freguesia',
-            'brasao'      : 'brasao',
-            'name'        : 'name'
+            'brasao'      : 'brasao'
         }
         const data = {}
         for (let i in properties) {
@@ -259,13 +260,16 @@ export default class GeojsonController extends Controller {
         // method that we will use to update the control based on feature properties passed
         info.update = async function (props) {
             if (typeof(props) === 'object') {
-                this._div.innerHTML = '<h4>DETAILS</h4>'
+                // this._div.innerHTML = '<h4>DETAILS</h4>'
+                this._div.innerHTML += (`<p>${props.name}<\p>` ?? '')
                 this._div.innerHTML += (props.distrito ? `<p>DISTRITO: ${props.distrito}</p>`: '')
                 this._div.innerHTML += (props.concelho ? `<p>CONCELHO: ${props.concelho}</p>` : '')
                 this._div.innerHTML += (props.freguesia ? `<p>FREGUESIA: ${props.freguesia}</p>` : '')
                 this._div.innerHTML += (props.brasao && props.brasao !== 'nan' ? `<p><img src=${props.brasao} alt="sem brasao" /></p>` : '')
             }
         };
+
+        info.clear = () => document.querySelector('.info').innerHTML = ''
 
         info.addTo(map);
         return info
