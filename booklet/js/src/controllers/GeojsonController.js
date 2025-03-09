@@ -92,7 +92,7 @@ export default class GeojsonController extends Controller {
                 fillOpacity: 0.1
             }
         }
-        const imageUrl = `${this.path}/booklet/js/files/imagens/Pgt-alm-sat.png`
+        const imageUrl = `${this.path}/booklet/js/files/imagens/Pgt-alm.png`
         const geojson = await this.service.getGeojson({
                 file: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm.json`,
                 reverse: true
@@ -227,6 +227,9 @@ export default class GeojsonController extends Controller {
 
     /** Customize names */
     #customName(properties) {
+        console.log(
+            properties
+        )
         const filter = {
             'name'        : 'name',
             'dis_name'    : 'distrito',
