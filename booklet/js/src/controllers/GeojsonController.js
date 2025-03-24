@@ -4,40 +4,86 @@ import GeojsonService from "../services/GeojsonService.js";
 import { removeAccent, removeWhiteSpace } from "../lib/utils.js";
 
 export default class GeojsonController extends Controller {
+    #map
+    div
     path                  = 'modules/custom'
     distritoInConcelhos   = []
     concelhosInFreguesias = []
 
-    static initializer() {
+    static async initializer() {
         const geojsonController = new GeojsonController({
-                view: new GeojsonView(),
-                service: new GeojsonService()
-            }),
-            page = geojsonController.view.page
-
+            view: new GeojsonView(),
+            service: new GeojsonService()
+        })
+        const page = geojsonController.view.page
         geojsonController.#layerGroup({
             // center: [ 38.6650095, -9.1784469 ],
-            // center: [ 38.6672692, -9.1740225 ],
             center: [ 38.66642, -9.17650 ],
-            // center: [40.712216, -74.22655], //imageOverlay
-            // center: [ 38666145, -9176470 ],
             zoom: 17
         })
-     }
+    }
 
-    #layerGroup({ center, zoom }) {
-        let density
-        let geojson
+    async #addImages(layerControl) {
+        /** Piaget Almada building */
+        // const pgt_alm_3d = await this.#imageOverlay({
+        //     layerControl,
+        //     imageUrl: `${this.path}/booklet/js/files/imagens/Piaget.png`,
+        //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm.json`
+        // })
+        const pgt_alm = await this.#imageOverlay({
+            layerControl,
+            imageUrl: `${this.path}/booklet/js/files/imagens/Piaget_white_background.png`,
+            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm.json`
+        })
+        const pgt_alm_a0 = await this.#imageOverlay({
+            layerControl, nameControl: "Edifícil A Piso 0",
+            imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a0.png`,
+            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm-a0.json`
+        })
+        const pgt_alm_a1 = await this.#imageOverlay({
+            layerControl, nameControl: "Edifícil A Piso 1",
+            imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a1.png`,
+            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm-a0.json`
+        })
+        const pgt_alm_a2 = await this.#imageOverlay({
+            layerControl, nameControl: "Edifícil A Piso 2",
+            imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a2.png`,
+            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm-a0.json`
+        })
+
+        /** PanelControl */
+        const density = await L.geoJSON(pgt_alm.geojson, { style: pgt_alm.style })
+        layerControl.addOverlay(pgt_alm.image, 'Piaget Almada' )
+        // layerControl.addOverlay(pgt_alm_3d.image, 'Piaget Almada 3D' )
+
+        this.addInteration({
+            geojson: pgt_alm.geojson, style: pgt_alm.style,  density, layerControl
+        }).addTo(this.#map)
+
+        return [ pgt_alm, pgt_alm_a0, pgt_alm_a1, pgt_alm_a2 ]
+    }
+
+    async #layerGroup({ center, zoom }) {
         const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 21,
-                attribution: '©'
-            }),
-            osmHOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '©'
-            });
+            maxZoom: 21,
+            attribution: '© OpenStreetMap'
+        })
+        const osmHOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            maxZoom: 21,
+            attribution: '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France'
+        });
+        const Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 21,
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        })
+        const baseMaps = {
+            "OpenStreetMap": osm,
+            "<span style='color: red'>OpenStreetMap.HOT</span>": osmHOT
+        }
+        const layerControl = L.control.layers(baseMaps)
+        layerControl.addBaseLayer(Esri_WorldImagery, "Satélite")
 
-        const map = L.map('map', {
+        this.#map = L.map('map', {
             // center: [ 40.543577, -8.4532394 ],
             // zoom: 7,
             center, zoom,
@@ -45,41 +91,23 @@ export default class GeojsonController extends Controller {
             loadingControl: true
         })
 
-        const baseMaps = {
-                "OpenStreetMap": osm,
-                "<span style='color: red'>OpenStreetMap.HOT</span>": osmHOT
-            },
-            layerControl = L.control.layers(baseMaps).addTo(map);
+        /** Piaget Almada building */
+        // const [ images, namesControl ] = await
+        this.#addImages(layerControl)
+        // for (let i in images) {
+        //     console.log(
+        //         images[i],
+        //         namesControl[i]
+        //     )
+        //     layerControl.addOverLay(images[i], namesControl[i])
+        // }
+        // console.log(
+        //     images,namesControl,
+        //     layerControl
+        // )
+        // layerControl.addOverLay(images, namesControl)
+        layerControl.addTo(this.#map)
 
-        const openTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            maxZoom: 21,
-            attribution: '©'
-        });
-
-
-        const style = (feature) => {
-            return {
-                fillColor: this.getColorState(feature.properties),
-                weight: 2,
-                opacity: 0.01,
-                // color: 'red',
-                dashArray: '3',
-                fillOpacity: 0.01
-            }
-        }
-
-        layerControl.addBaseLayer(openTopoMap, "OpenTopoMap")
-
-        const pgt_alm = this.#imageOverlay({
-            map, style, layerControl,
-            imageUrl: `${this.path}/booklet/js/files/imagens/Piaget2.png`,
-            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm.json`
-        })
-        // const pgt_alm_a = this.#imageOverlay({
-        //     map, style, layerControl,
-        //     imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a0.png`,
-        //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm-a0.json`
-        // })
 
     //////////////////////////////////////////////////
         /** Enable district */
@@ -101,7 +129,7 @@ export default class GeojsonController extends Controller {
      ///////////////////////////////////////////////
     }
 
-    getColorState(d) {
+    #getColorState(d) {
         if ((d.dis_name || d.distrito) && (!d.con_name && !d.concelho))  return '#f3fd7e'
         if ((d.con_name || d.concelho) && (!d.freguesia && !d.fre_name)) return '#e18041'
         if (d.fre_name || d.freguesia) return '#d74222'
@@ -110,22 +138,35 @@ export default class GeojsonController extends Controller {
     /**
      * ImageOverlay (show buildings)
     */
-    async #imageOverlay({ map, imageUrl, coodFile, style, layerControl }) {
+    async #imageOverlay({ imageUrl, coodFile }) {
         const geojson = await this.service.getGeojson({
             file: coodFile,
-            reverse: true
+            reverse: false
         })
-        const imageBounds = geojson.features[0].geometry.coordinates[0]
-        L.imageOverlay(imageUrl, imageBounds, { opacity: 0.8 }).addTo(map)
+        const style = (feature) => {
+            return {
+                fillColor: this.#getColorState(feature.properties),
+                weight: 2,
+                opacity: 0.01,
+                // color: 'red',
+                dashArray: '3',
+                fillOpacity: 0.01
+            }
+        }
 
-        const coordReverse = this.service.coordReverse(geojson)
+        const coordinates = geojson.features[0].geometry.coordinates[0]
+        const imageBounds = this.service.coordReverse(coordinates)
+        const image = L.imageOverlay(imageUrl, imageBounds, { opacity: 1 })
 
-        const density = L.geoJSON(coordReverse, { style })
-        this.addInteration({
-            map, geojson, style, density, layerControl
-        }).addTo(map)
+        /** PanelControl */
+        // const density = await L.geoJSON(geojson, { style })
+        // layerControl.addOverlay(image, nameControl)
 
-        return geojson
+        // this.addInteration({
+        //     geojson, style,  density, layerControl
+        // }).addTo(map)
+
+        return { geojson, image, style }
     }
 
     #getRegions({ distrito, concelho, freguesia, file }) {
@@ -154,8 +195,9 @@ export default class GeojsonController extends Controller {
         }
     }
 
-    addInteration({ map, geojson, style, density, layerControl }) {
-        const info = this.#customControl({ map })
+    addInteration({ geojson, style, density, layerControl }) {
+        const map = this.#map
+        const info = this.#customControl()
         const highlightFeature = (e) => {
             const layer = e.target
             layer.setStyle({
@@ -214,12 +256,10 @@ export default class GeojsonController extends Controller {
                     )
                     */
                     /////////////////////////////////////////////////
-
-
                 }
             })
         }
-        this.#customLegendControl(map)
+        // this.#customLegendControl(map)
         return L.geoJson(geojson, {
             style,
             onEachFeature
@@ -249,11 +289,13 @@ export default class GeojsonController extends Controller {
     }
 
     /** Custom Control */
-    #customControl({ map }) {
+    #customControl() {
+        const map = this.#map
         const info = L.control();
 
         info.onAdd = function (map) {
-            this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+            let div = document.querySelector('.info')
+            this._div = div ?? L.DomUtil.create('div', 'info'); // create a div with a class "info"
             this.update();
             return this._div;
         };
@@ -280,12 +322,13 @@ export default class GeojsonController extends Controller {
         const legend = L.control({ position: 'bottomleft' })
 
         legend.onAdd = function (map) {
-            const div = L.DomUtil.create('div', 'info legend'),
-                getColor = {
-                    Distrito : '#f3fd7e',
-                    Concelho : '#e18041',
-                    Freguesia: '#d74222'
-                }
+            const div = L.DomUtil.create('div', 'info legend')
+            let getColor = {
+                Distrito : '#f3fd7e',
+                Concelho : '#e18041',
+                Freguesia: '#d74222'
+            }
+
             // loop through our density intervals and generate a label with a colored square for each interval
             for (let d in getColor) {
                 div.innerHTML +=

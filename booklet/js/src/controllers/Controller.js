@@ -11,7 +11,7 @@ export default class Controller {
       this.service = service
    }
 
-   static initializer() {
+   static async initializer() {
       const controller = new Controller({
          view: new View(),
          service: new Service()

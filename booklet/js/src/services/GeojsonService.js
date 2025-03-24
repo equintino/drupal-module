@@ -75,21 +75,6 @@ export default class GeojsonService extends Service {
     }
 
     coordReverse(data) {
-        return data.features.map((coods) => {
-            if (coods.geometry.type === 'Polygon') {
-                let coodsRev = []
-                coods.geometry.coordinates.map((e) => {
-                    coodsRev.push(e.map((_e) => [ _e[1], _e[0] ]))
-                })
-                coods.geometry.coordinates = coodsRev
-            }
-            if (coods.geometry.type === 'Point') {
-                coods.geometry.coordinates = [
-                    coods.geometry.coordinates[1],
-                    coods.geometry.coordinates[0]
-                ]
-            }
-            return coods
-        })
+        return data.map((e) => [e[1], e[0]])
     }
 }
