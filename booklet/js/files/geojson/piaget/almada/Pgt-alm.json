@@ -1,5 +1,5 @@
 {"type":"FeatureCollection","licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","features":[{"type":"Feature","properties":{"place_id":272460208,"osm_type":"way","osm_id":410892440,"place_rank":30,"category":"amenity","type":"university","importance":5.83833066299995e-05,"addresstype":"amenity","name":"Instituto Piaget - Campus Universitário de Almada","display_name":"Instituto Piaget - Campus Universitário de Almada, Avenida José Cardoso Pires, Casquilho, Pragal, Almada, Cova da Piedade, Pragal e Cacilhas, Almada, Setúbal, 2805-023, Portugal","address":{"amenity":"Instituto Piaget - Campus Universitário de Almada","road":"Avenida José Cardoso Pires","neighbourhood":"Casquilho","suburb":"Pragal","city_district":"Almada, Cova da Piedade, Pragal e Cacilhas","city":"Almada","county":"Setúbal","ISO3166-2-lvl6":"PT-15","postcode":"2805-023","country":"Portugal","country_code":"pt"}},"bbox":[-9.1784469,38.6650095,-9.1740225,38.6672692],"geometry":{"type":"Polygon","coordinates":[[[-9.1784469,38.6661446],[-9.1784152,38.6660971],[-9.1776905,38.6650095],[-9.1774961,38.665025],[-9.1756816,38.6657278],[-9.1752739,38.665776],[-9.1751585,38.6658388],[-9.1747026,38.6659854],[-9.1740253,38.6664608],[-9.1740225,38.6664831],[-9.1740292,38.6665048],[-9.1740449,38.6665237],[-9.1740676,38.6665375],[-9.1740949,38.6665446],[-9.1746758,38.6666535],[-9.1746758,38.6666943],[-9.1746931,38.6667459],[-9.1747254,38.6668027],[-9.1747735,38.6668679],[-9.1748427,38.6669441],[-9.174956,38.6670525],[-9.1750713,38.6671561],[-9.1752101,38.6672692],[-9.1760061,38.6669593],[-9.1759042,38.6668231],[-9.1772344,38.6665931],[-9.1784469,38.6661446]]]}},
-    {"type":"Feature","properties":{"name":"Prédio A"},"geometry":{"type":"Polygon","coordinates":[[
+    {"type":"Feature","properties":{"name":"Prédio A","src":"Pgt-alm-a0.png","json":"Pgt-alm-a.json","floor":"0,1,2"},"geometry":{"type":"Polygon","coordinates":[[
     [ -9.17786382851241, 38.66610736626144 ],
     [ -9.17789735612229, 38.666184330609305 ],
     [ -9.177904061644266, 38.666184330609305 ],
@@ -16,7 +16,7 @@
     [ -9.178129367182676, 38.666034066805594 ],
     [ -9.17786315796021, 38.66610736626144 ]
     ]]}},
-    {"type":"Feature","properties":{"name":"Prédio B"},"geometry":{"type":"Polygon","coordinates":[[
+    {"type":"Feature","properties":{"name":"Prédio B","src":"Pgt-alm-b0.png","json":"Pgt-alm-b.json","floor":"0,1,2"},"geometry":{"type":"Polygon","coordinates":[[
         [-9.1776488792833,38.66614314732986],
         [-9.177626751060778,38.66615100083461],
         [-9.17762876271737,38.66615361866933],
@@ -43,7 +43,7 @@
         [-9.177618033898533,38.66608764920328],
         [-9.17764552653903,38.666141576629244]
     ]]}},
-    {"type":"Feature","properties":{"name":"Prédio C"},"geometry":{"type":"Polygon","coordinates":[[
+    {"type":"Feature","properties":{"name":"Prédio C","src":"Pgt-alm-c0.png","json":"Pgt-alm-c.json","floor":"0,1,2"},"geometry":{"type":"Polygon","coordinates":[[
         [-9.177166275868073,38.66650392650993],
         [-9.176745839640148,38.666559947876024],
         [-9.17674248687916,38.66654738233977],
@@ -56,7 +56,7 @@
         [-9.177137442123573,38.666352616245945],
         [-9.177167616972469,38.66650392650993]
     ]]}},
-    {"type":"Feature","properties":{"name":"Prédio D"},"geometry":{"type":"Polygon","coordinates":[[
+    {"type":"Feature","properties":{"name":"Prédio D","src":"Pgt-alm-d0.png","json":"Pgt-alm-d.json","floor":"0,1"},"geometry":{"type":"Polygon","coordinates":[[
         [-9.177778149533253,38.665415575159216],
         [-9.17738855870642,38.66554175598007],
         [-9.177378500423455,38.66552133669221],
@@ -73,7 +73,7 @@
         [-9.177706400447601,38.6652852055309],
         [-9.177780161189343,38.66541400444326]
     ]]}},
-    {"type":"Feature","properties":{"name":"Prédio E"},"geometry":{"type":"Polygon","coordinates":[[
+    {"type":"Feature","properties":{"name":"Prédio E","src":"Pgt-alm-e0.png","json":"Pgt-alm-e.json","floor":"0,1"},"geometry":{"type":"Polygon","coordinates":[[
         [-9.175887192231112,38.665855374579074],
         [-9.175869087321777,38.665828672549154],
         [-9.175767833939931,38.66584856818022],
@@ -102,7 +102,7 @@
         [-9.176176870779601,38.665761132074664],
         [-9.175889203886811,38.665855374577625]
     ]]}},
-    {"type":"Feature","properties":{"name":"Prédios FG"},"geometry":{"type":"Polygon","coordinates":[[
+    {"type":"Feature","properties":{"name":"Prédio FG","src":"Pgt-alm-fg0.png","json":"Pgt-alm-fg.json","floor":"0,1"},"geometry":{"type":"Polygon","coordinates":[[
         [-9.176268065891662,38.665912443586876],
         [-9.176620105795427,38.6657956876718],
         [-9.176584566528952,38.665719770046415],
@@ -114,7 +114,7 @@
         [-9.176172176927398,38.66576270278238],
         [-9.176270077548255,38.66591296715556]
     ]]}},
-    {"type":"Feature","properties":{"name":"Prédios H"},"geometry":{"type":"Polygon","coordinates":[[
+    {"type":"Feature","properties":{"name":"Prédio H","src":"Pgt-alm-h0.png","json":"Pgt-alm-h.json","floor":"-1,0,1"},"geometry":{"type":"Polygon","coordinates":[[
         [-9.176258852940963,38.66662545591511],
         [-9.176146200171758,38.666616555335295],
         [-9.175936317333894,38.6666495398314],

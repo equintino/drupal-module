@@ -23,44 +23,56 @@ export default class GeojsonController extends Controller {
         })
     }
 
-    async #addImages(layerControl) {
+    async #markCoordMap({ layerControl, imageUrl, coodFile }) {
         /** Piaget Almada building */
-        // const pgt_alm_3d = await this.#imageOverlay({
+        const img = await this.#imageOverlay({
+            layerControl, imageUrl, coodFile
+        })
+        // const Pgt_alm_3d = await this.#imageOverlay({
         //     layerControl,
         //     imageUrl: `${this.path}/booklet/js/files/imagens/Piaget.png`,
-        //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm.json`
+        //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/Pgt-alm.json`
         // })
-        const pgt_alm = await this.#imageOverlay({
-            layerControl,
-            imageUrl: `${this.path}/booklet/js/files/imagens/Piaget_white_background.png`,
-            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm.json`
-        })
-        const pgt_alm_a0 = await this.#imageOverlay({
-            layerControl, nameControl: "Edifícil A Piso 0",
-            imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a0.png`,
-            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm-a0.json`
-        })
-        const pgt_alm_a1 = await this.#imageOverlay({
-            layerControl, nameControl: "Edifícil A Piso 1",
-            imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a1.png`,
-            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm-a0.json`
-        })
-        const pgt_alm_a2 = await this.#imageOverlay({
-            layerControl, nameControl: "Edifícil A Piso 2",
-            imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a2.png`,
-            coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/pgt-alm-a0.json`
-        })
+        // const Pgt_alm = await this.#imageOverlay({
+        //     layerControl,
+        //     imageUrl: `${this.path}/booklet/js/files/imagens/Piaget_white_background.png`,
+        //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/Pgt-alm.json`
+        // })
+        // const Pgt_alm_a0 = await this.#imageOverlay({
+        //     layerControl, nameControl: "Edifícil A Piso 0",
+        //     imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a0.png`,
+        //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/Pgt-alm-a0.json`
+        // })
+        // const Pgt_alm_a1 = await this.#imageOverlay({
+        //     layerControl, nameControl: "Edifícil A Piso 1",
+        //     imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a1.png`,
+        //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/Pgt-alm-a0.json`
+        // })
+        // const Pgt_alm_a2 = await this.#imageOverlay({
+        //     layerControl, nameControl: "Edifícil A Piso 2",
+        //     imageUrl: `${this.path}/booklet/js/files/imagens/Pgt-alm-a2.png`,
+        //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/Pgt-alm-a0.json`
+        // })
 
         /** PanelControl */
-        const density = await L.geoJSON(pgt_alm.geojson, { style: pgt_alm.style })
-        layerControl.addOverlay(pgt_alm.image, 'Piaget Almada' )
-        // layerControl.addOverlay(pgt_alm_3d.image, 'Piaget Almada 3D' )
+        const density = await L.geoJSON(img.geojson, { style: img.style })
+        // const density2 = await L.geoJSON(Pgt_alm.geojson, { style: Pgt_alm.style })
+        // layerControl.addOverlay(Pgt_alm.image, 'Piaget Almada')
 
         this.addInteration({
-            geojson: pgt_alm.geojson, style: pgt_alm.style,  density, layerControl
+            geojson: img.geojson,
+            style: img.style,
+            density, layerControl
         }).addTo(this.#map)
 
-        return [ pgt_alm, pgt_alm_a0, pgt_alm_a1, pgt_alm_a2 ]
+        // this.addInteration({
+        //     geojson: Pgt_alm.geojson,
+        //     style: Pgt_alm.style,
+        //     density, layerControl
+        // }).addTo(this.#map)
+
+        return img
+        // return [ Pgt_alm, Pgt_alm_a0, Pgt_alm_a1, Pgt_alm_a2 ]
     }
 
     async #layerGroup({ center, zoom }) {
@@ -92,8 +104,16 @@ export default class GeojsonController extends Controller {
         })
 
         /** Piaget Almada building */
-        // const [ images, namesControl ] = await
-        this.#addImages(layerControl)
+        const imageUrl = `${this.path}/booklet/js/files/geojson/piaget/almada/image/Pgt-alm.png`
+        const coodFile = `${this.path}/booklet/js/files/geojson/piaget/almada/Pgt-alm.json`
+        const markCoordMap = await this.#markCoordMap({ layerControl, imageUrl, coodFile })
+
+        // overLay.addTo(this.#map)
+        // const imageOverlay = await this.#imageOverlay({ imageUrl, coodFile })
+        // console.log(
+        //     imageOverlay.image.addTo(this.#map)
+        // )
+
         // for (let i in images) {
         //     console.log(
         //         images[i],
@@ -226,8 +246,21 @@ export default class GeojsonController extends Controller {
                 mouseout: () => info.clear()
             })
             layer.on({
-                click: () => {
+                click: async () => {
+                    const floor = await this.#imageOverlay({
+                        layerControl, nameControl: `${feature.properties.name}`,
+                        imageUrl: `${this.path}/booklet/js/files/geojson/piaget/almada/image/${feature.properties.src}`,
+                        coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/${feature.properties.json}`
+                    })
 
+                    // const floor2 = await this.#markCoordMap({
+                    //     layerControl, nameControl: `${feature.properties.name}`,
+                    //     imageUrl: `${this.path}/booklet/js/files/imagens/${feature.properties.src}`,
+                    //     coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/${feature.properties.json}`
+                    // })
+
+                    floor.image.addTo(this.#map)
+                    this.#buildingFloorsl({ feature: floor.geojson.features[0], layerControl })
 
                     /////////////////////////////////////////////////
                     /** Enable District */
@@ -279,7 +312,9 @@ export default class GeojsonController extends Controller {
             'fre_name'    : 'freguesia',
             'freguesia'   : 'freguesia',
             'Freguesia'   : 'freguesia',
-            'brasao'      : 'brasao'
+            'brasao'      : 'brasao',
+            'src'         : 'src',
+            'json'        : 'json'
         }
         const data = {}
         for (let i in properties) {
@@ -339,5 +374,63 @@ export default class GeojsonController extends Controller {
         };
 
         legend.addTo(map);
+    }
+
+    #buildingFloorsl({ feature, layerControl }) {
+        const legend = L.control({ position: 'bottomleft' })
+        const map = this.#map
+
+        legend.onAdd = () => {
+            const divLegend = document.querySelector('.legend')
+            const div = divLegend ? divLegend : L.DomUtil.create('div', 'legend')
+            let option = ''
+            let selected = ''
+            div.innerHTML = `<strong style='padding: 0 10px'>${feature.properties.name}</strong>`
+
+            feature.properties.floor.split(',').forEach((i) => {
+                selected = i == 0 ? 'selected' : ''
+                option += `<option value="${i}" ${selected}>Piso ${i}</option>`
+            })
+
+            div.innerHTML += `<select name="${feature.properties.name}">${option}</select>`
+            div.style.background = '#2b2d2e'
+            div.style.color = 'white'
+            div.style.margin = '2px'
+
+            return div;
+        };
+        legend.addTo(map);
+        this.#changeLegend({ feature, layerControl })
+    }
+
+    #changeLegend({ feature, layerControl }) {
+        const legend = document.querySelector('.legend > select')
+        legend.addEventListener('change', async (e) => {
+            const src = feature.properties.src.split('.')
+            const floor = await this.#imageOverlay({
+                layerControl, nameControl: `${e.target.name}${e.target.value}`,
+                imageUrl: `${this.path}/booklet/js/files/geojson/piaget/almada/image/${src[0].slice(0,-1)}${e.target.value}.${src[1]}`,
+                coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/${feature.properties.json}`
+            })
+
+            floor.image.addTo(this.#map)
+
+            // const coordinates = floor.geojson.features[0].geometry.coordinates[0]
+            // const imageBounds = this.service.coordReverse(coordinates)
+            // const image = L.imageOverlay(floor.image, imageBounds, { opacity: 1 })
+
+            /** PanelControl */
+            // const density = await L.imageOverlay(floor.image, { style: floor.style })
+            // density.addTo(this.#map)
+            // L.addOverlay(floor.image, 'Prédio A' ).addTo(this.#map)
+            // layerControl.addOverlay(floor.image, 'Piaget Almada' ).addTo(this.#map)
+            // layerControl.addOverlay(Pgt_alm_3d.image, 'Piaget Almada 3D' )
+
+            // this.addInteration({
+            //     geojson: floor.geojson,
+            //     style: floor.style,
+            //     density, layerControl
+            // }).addTo(this.#map)
+        })
     }
 }

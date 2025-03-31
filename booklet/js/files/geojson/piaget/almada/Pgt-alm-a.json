@@ -1,4 +1,4 @@
-{"type":"FeatureCollection","licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","features":[{"type":"Feature","properties":{"name":"Prédio A"},"geometry":{"type":"Polygon","coordinates":[[
+{"type":"FeatureCollection","licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","features":[{"type":"Feature","properties":{"name":"Prédio A","src":"Pgt-alm-a0.png","json":"Pgt-alm-a.json","floor":"0,1,2"},"geometry":{"type":"Polygon","coordinates":[[
     [ -9.17786382851241, 38.66610736626144 ],
     [ -9.17789735612229, 38.666184330609305 ],
     [ -9.177904061644266, 38.666184330609305 ],
