@@ -5,6 +5,7 @@ import { removeAccent, removeWhiteSpace } from "../lib/utils.js";
 
 export default class GeojsonController extends Controller {
     #map
+    #circle
     div
     path                  = 'modules/custom'
     distritoInConcelhos   = []
@@ -246,7 +247,7 @@ export default class GeojsonController extends Controller {
                 mouseout: () => info.clear()
             })
             layer.on({
-                click: async () => {
+                click: async (e) => {
                     const floor = await this.#imageOverlay({
                         layerControl, nameControl: `${feature.properties.name}`,
                         imageUrl: `${this.path}/booklet/js/files/geojson/piaget/almada/image/${feature.properties.src}`,
@@ -407,11 +408,21 @@ export default class GeojsonController extends Controller {
         const legend = document.querySelector('.legend > select')
         legend.addEventListener('change', async (e) => {
             const src = feature.properties.src.split('.')
+            const image = src[0].slice(0,-1) + e.target.value + '.' + src[1]
             const floor = await this.#imageOverlay({
                 layerControl, nameControl: `${e.target.name}${e.target.value}`,
-                imageUrl: `${this.path}/booklet/js/files/geojson/piaget/almada/image/${src[0].slice(0,-1)}${e.target.value}.${src[1]}`,
+                imageUrl: `${this.path}/booklet/js/files/geojson/piaget/almada/image/${image}`,
                 coodFile: `${this.path}/booklet/js/files/geojson/piaget/almada/${feature.properties.json}`
             })
+            if (typeof(this.#circle) !== 'undefined') this.#circle.remove()
+            if (image === 'Pgt-alm-c2.png') {
+                this.#circle = L.circle([38.66655024717577, -9.176800590875438], {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: 0.5
+                }).addTo(this.#map);
+            }
 
             floor.image.addTo(this.#map)
 
